@@ -33,7 +33,7 @@ function init() {
 
   window.addEventListener('resize', onResize);
 
-  loadFaceTextureAndCreateParticles('face.jpeg'); // your human face image
+  loadFaceTextureAndCreateParticles('face.jpg'); // your human face image
 }
 
 function onResize() {
