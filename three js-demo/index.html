@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Realistic Viseme-Ready AI Face (Particle System)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="ui">
+    <div class="panel">
+      <h2>Viseme Timeline</h2>
+      <button onclick="demoPlayVisemeSequence()">Play Demo Sequence</button>
+      <div id="visemeTimeline"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Viseme Controls</h2>
+      <button onclick="setViseme('AI')">AI</button>
+      <button onclick="setViseme('EH')">EH</button>
+      <button onclick="setViseme('FV')">FV</button>
+      <button onclick="setViseme('MM')">MM</button>
+      <button onclick="setViseme(null)">Clear</button>
+    </div>
+
+    <div class="panel">
+      <h2>Emotion Blending</h2>
+      <label>Neutral <input type="range" min="0" max="1" step="0.01" value="1" oninput="setEmotionWeight('neutral', this.value)"></label>
+      <label>Joy <input type="range" min="0" max="1" step="0.01" value="0" oninput="setEmotionWeight('joy', this.value)"></label>
+      <label>Anger <input type="range" min="0" max="1" step="0.01" value="0" oninput="setEmotionWeight('anger', this.value)"></label>
+      <label>Surprise <input type="range" min="0" max="1" step="0.01" value="0" oninput="setEmotionWeight('surprise', this.value)"></label>
+      <label>Sadness <input type="range" min="0" max="1" step="0.01" value="0" oninput="setEmotionWeight('sadness', this.value)"></label>
+      <div id="currentEmotionLabel">Current Emotion: Neutral</div>
+    </div>
+
+    <div class="panel">
+      <h2>Eye Control</h2>
+      <label>Gaze X <input type="range" min="-1" max="1" step="0.01" value="0" oninput="setGaze(this.value, null)"></label>
+      <label>Gaze Y <input type="range" min="-1" max="1" step="0.01" value="0" oninput="setGaze(null, this.value)"></label>
+      <label>Blink Rate (s) <input type="range" min="0.3" max="5" step="0.1" value="2" oninput="setBlinkRate(this.value)"></label>
+      <label>Saccade Speed <input type="range" min="0" max="1" step="0.01" value="0.3" oninput="setSaccadeSpeed(this.value)"></label>
+    </div>
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
