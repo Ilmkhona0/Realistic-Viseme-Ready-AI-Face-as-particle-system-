@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Particle Avatar Demo</title>
+  <style>
+    body { margin: 0; background: #0a0f1c; overflow: hidden; }
+    #ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: sans-serif;
+    }
+    button { margin: 2px; }
+  </style>
+</head>
+<body>
+
+<div id="ui">
+  <div>Visemes:</div>
+  <button onclick="setViseme('A')">A</button>
+  <button onclick="setViseme('E')">E</button>
+  <button onclick="setViseme('O')">O</button>
+  <button onclick="setViseme('M')">M</button>
+
+  <div>Emotion:</div>
+  <button onclick="setEmotion('neutral')">Neutral</button>
+  <button onclick="setEmotion('joy')">Joy</button>
+  <button onclick="setEmotion('anger')">Anger</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let viseme = "A";
+let emotion = "neutral";
+
+function setViseme(v) { viseme = v; }
+function setEmotion(e) { emotion = e; }
+
+// Eye blink
+let blink = 0;
+setInterval(() => {
+  blink = 1;
+  setTimeout(() => blink = 0, 150);
+}, 3000);
+
+// Particle face (simple dots)
+function drawFace() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let cx = canvas.width / 2;
+  let cy = canvas.height / 2;
+
+  // FACE PARTICLES
+  for (let i = 0; i < 800; i++) {
+    let angle = Math.random() * Math.PI * 2;
+    let r = 120 + Math.random() * 10;
+    let x = cx + Math.cos(angle) * r;
+    let y = cy + Math.sin(angle) * r;
+
+    ctx.fillStyle = "rgba(255,180,100,0.8)";
+    ctx.fillRect(x, y, 2, 2);
+  }
+
+  // EYES
+  let eyeOffset = 40;
+  let eyeY = cy - 30;
+
+  let eyeHeight = blink ? 2 : 10;
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(cx - eyeOffset, eyeY, 20, eyeHeight);
+  ctx.fillRect(cx + eyeOffset - 20, eyeY, 20, eyeHeight);
+
+  // MOUTH (viseme-driven)
+  let mouthY = cy + 40;
+  let mouthWidth = 60;
+  let mouthHeight = 10;
+
+  if (viseme === "A") mouthHeight = 25;
+  if (viseme === "E") mouthWidth = 80;
+  if (viseme === "O") mouthHeight = 35;
+  if (viseme === "M") mouthHeight = 5;
+
+  // Emotion blending
+  if (emotion === "joy") mouthY -= 10;
+  if (emotion === "anger") mouthY += 5;
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(cx - mouthWidth/2, mouthY, mouthWidth, mouthHeight);
+}
+
+// Animation loop
+function animate() {
+  drawFace();
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
