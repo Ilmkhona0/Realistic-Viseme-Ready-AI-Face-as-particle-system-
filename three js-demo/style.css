@@ -15,16 +15,9 @@ body {
   overflow-y: auto;
 }
 
-.panel {
-  border: 1px solid #333;
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-
-.panel h2 {
-  margin-top: 0;
+h2 {
   font-size: 14px;
+  margin-top: 10px;
 }
 
 button {
@@ -54,3 +47,4 @@ input[type="range"] {
 #canvas-container {
   flex: 1;
 }
+
