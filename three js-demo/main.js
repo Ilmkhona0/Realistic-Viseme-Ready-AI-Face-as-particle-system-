@@ -1,30 +1,50 @@
-PS C:\Users\ENVY> cd D:\Freelancer_Demo
-PS D:\Freelancer_Demo> node D:\Freelancer_Demo\Minimal example of a code‑designed 2D face.js
-node:internal/modules/cjs/loader:1228
-  throw err;
-  ^
+const img = document.querySelector(".face-image");
 
-Error: Cannot find module 'D:\Freelancer_Demo\Minimal'
-    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
-    at Module._load (node:internal/modules/cjs/loader:1051:27)
-    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:174:12)
-    at node:internal/main/run_main_module:28:49 {
-  code: 'MODULE_NOT_FOUND',
-  requireStack: []
+// VISMES (just simple CSS transforms for now)
+function setViseme(type) {
+  if (!img) return;
+
+  switch (type) {
+    case "AI":
+      img.style.transform = "scaleY(1.1)";
+      break;
+    case "EH":
+      img.style.transform = "scaleX(1.05)";
+      break;
+    case "FV":
+      img.style.transform = "translateY(5px)";
+      break;
+    case "MM":
+      img.style.transform = "scale(0.95)";
+      break;
+    default:
+      img.style.transform = "none";
+  }
 }
 
-Node.js v20.18.0
-PS D:\Freelancer_Demo> node Minimal example of a code‑designed 2D face.js
-node:internal/modules/cjs/loader:1228
-  throw err;
-  ^
+// EMOTIONS (simple color filters)
+function setEmotion(type, value) {
+  value = Number(value);
 
-Error: Cannot find module 'D:\Freelancer_Demo\Minimal'
-    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
-    at Module._load (node:internal/modules/cjs/loader:1051:27)
-    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:174:12)     
-    at node:internal/main/run_main_module:28:49 {
-  code: 'MODULE_NOT_FOUND',
-  requireStack: []
+  let filter = "";
+
+  if (type === "joy") filter = `brightness(${1 + value * 0.3})`;
+  if (type === "anger") filter = `hue-rotate(${value * 20}deg) saturate(${1 + value})`;
+  if (type === "surprise") filter = `contrast(${1 + value * 0.5})`;
+  if (type === "sadness") filter = `grayscale(${value})`;
+
+  img.style.filter = filter;
+
+  document.getElementById("emotionLabel").textContent =
+    "Current Emotion: " + type.charAt(0).toUpperCase() + type.slice(1);
 }
 
+// EYE GAZE (move the image slightly)
+function setGaze(x, y) {
+  const current = img.style.transform.replace(/translate.*?\)/, "");
+
+  const tx = x !== null ? x * 10 : 0;
+  const ty = y !== null ? y * 10 : 0;
+
+  img.style.transform = `${current} translate(${tx}px, ${ty}px)`;
+}
