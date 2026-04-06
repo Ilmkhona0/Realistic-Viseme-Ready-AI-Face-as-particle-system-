@@ -1,50 +1,51 @@
-const img = document.querySelector(".face-image");
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-// VISMES (just simple CSS transforms for now)
-function setViseme(type) {
-  if (!img) return;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x202020);
 
-  switch (type) {
-    case "AI":
-      img.style.transform = "scaleY(1.1)";
-      break;
-    case "EH":
-      img.style.transform = "scaleX(1.05)";
-      break;
-    case "FV":
-      img.style.transform = "translateY(5px)";
-      break;
-    case "MM":
-      img.style.transform = "scale(0.95)";
-      break;
-    default:
-      img.style.transform = "none";
-  }
+const camera = new THREE.PerspectiveCamera(
+  50,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  100
+);
+camera.position.set(0, 1.5, 3);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// Light
+const light = new THREE.DirectionalLight(0xffffff, 2);
+light.position.set(2, 2, 2);
+scene.add(light);
+
+// Load model (no animation)
+const loader = new GLTFLoader();
+loader.load(
+  'face_base.glb',
+  (gltf) => {
+    const model = gltf.scene;
+    model.scale.set(1, 1, 1);
+    scene.add(model);
+  },
+  undefined,
+  (error) => console.error(error)
+);
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
 }
+animate();
 
-// EMOTIONS (simple color filters)
-function setEmotion(type, value) {
-  value = Number(value);
-
-  let filter = "";
-
-  if (type === "joy") filter = `brightness(${1 + value * 0.3})`;
-  if (type === "anger") filter = `hue-rotate(${value * 20}deg) saturate(${1 + value})`;
-  if (type === "surprise") filter = `contrast(${1 + value * 0.5})`;
-  if (type === "sadness") filter = `grayscale(${value})`;
-
-  img.style.filter = filter;
-
-  document.getElementById("emotionLabel").textContent =
-    "Current Emotion: " + type.charAt(0).toUpperCase() + type.slice(1);
-}
-
-// EYE GAZE (move the image slightly)
-function setGaze(x, y) {
-  const current = img.style.transform.replace(/translate.*?\)/, "");
-
-  const tx = x !== null ? x * 10 : 0;
-  const ty = y !== null ? y * 10 : 0;
-
-  img.style.transform = `${current} translate(${tx}px, ${ty}px)`;
-}
+// Resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
