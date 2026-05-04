@@ -6,9 +6,6 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="wrapper">
-    <img src="face_base.glp" alt="Face" class="face-image" />
-  </div>
   <div id="ui">
     <h2>Visemes</h2>
     <button onclick="setViseme('AI')">AI</button>
@@ -28,11 +25,20 @@
     <h2>Eye Control</h2>
     <label>Gaze X <input type="range" min="-1" max="1" step="0.01" value="0" oninput="setGaze(this.value, null)"></label>
     <label>Gaze Y <input type="range" min="-1" max="1" step="0.01" value="0" oninput="setGaze(null, this.value)"></label>
+
+    <div id="status">Loading model…</div>
   </div>
 
   <div id="canvas-container"></div>
 
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-  <script src="main.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
