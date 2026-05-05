@@ -48,6 +48,7 @@ loader.load(
     controls.update();
 
     if (status) status.textContent = 'Model loaded.';
+    humanizeFace(model);
     inspectAndBuildMaterialUI(model);
   },
   (xhr) => {
@@ -73,6 +74,41 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(container.clientWidth, container.clientHeight);
 });
+
+// Humanize parts of the face_base.glb model. Mesh names are known (see the
+// inspector log); materials shared across meshes are cloned per-mesh so each
+// body part can be tinted independently. Lips are painted into the Head_Geo
+// skin texture and can't be recolored separately at runtime.
+const HUMAN_TINTS = {
+  Head_Geo:      { color: 0xf2c9a5, roughness: 0.65, metalness: 0.0 }, // skin
+  Eyebrow_Geo:   { color: 0x3a2418, roughness: 0.9 },                   // dark brown
+  EyelashUp_Geo: { color: 0x140a06, roughness: 0.9 },                   // near-black
+  EyeInLf_Geo:   { color: 0x6a8aa8 },                                   // iris tint (multiply)
+  EyeInRt_Geo:   { color: 0x6a8aa8 },
+  TeethUp_Geo:   { color: 0xf0ebe0, roughness: 0.4 },
+  TeethDn_Geo:   { color: 0xf0ebe0, roughness: 0.4 },
+  GumUp_Geo:     { color: 0xc97676, roughness: 0.6 },
+  GumDn_Geo:     { color: 0xc97676, roughness: 0.6 },
+  Tongue_Geo:    { color: 0xa84a4a, roughness: 0.55 },
+};
+
+function humanizeFace(model) {
+  model.traverse((obj) => {
+    if (!obj.isMesh || !obj.material) return;
+    const tint = HUMAN_TINTS[obj.name];
+    if (!tint) return;
+
+    obj.material = obj.material.clone();
+    if (obj.material.color) obj.material.color.set(tint.color);
+    if (tint.roughness !== undefined && 'roughness' in obj.material) {
+      obj.material.roughness = tint.roughness;
+    }
+    if (tint.metalness !== undefined && 'metalness' in obj.material) {
+      obj.material.metalness = tint.metalness;
+    }
+    obj.material.needsUpdate = true;
+  });
+}
 
 function inspectAndBuildMaterialUI(model) {
   const seen = new Map();
