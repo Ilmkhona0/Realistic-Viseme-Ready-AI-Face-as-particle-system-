@@ -48,6 +48,7 @@ loader.load(
     controls.update();
 
     if (status) status.textContent = 'Model loaded.';
+    inspectAndBuildMaterialUI(model);
   },
   (xhr) => {
     if (status && xhr.total) {
@@ -72,6 +73,52 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(container.clientWidth, container.clientHeight);
 });
+
+function inspectAndBuildMaterialUI(model) {
+  const seen = new Map();
+  const meshLog = [];
+
+  model.traverse((obj) => {
+    if (!obj.isMesh) return;
+    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+    mats.forEach((mat, i) => {
+      if (!mat) return;
+      meshLog.push({ mesh: obj.name || '(unnamed mesh)', material: mat.name || '(unnamed material)', slot: i });
+      const key = mat.uuid;
+      if (!seen.has(key)) seen.set(key, mat);
+    });
+  });
+
+  console.group('GLB inspector');
+  console.table(meshLog);
+  console.log('Unique materials:', [...seen.values()].map((m) => m.name || '(unnamed)'));
+  console.groupEnd();
+
+  const host = document.getElementById('materialList');
+  if (!host) return;
+  host.innerHTML = '';
+
+  [...seen.values()].forEach((mat, idx) => {
+    const row = document.createElement('label');
+    row.className = 'mat-row';
+
+    const name = document.createElement('span');
+    name.textContent = mat.name || `material_${idx}`;
+
+    const picker = document.createElement('input');
+    picker.type = 'color';
+    const baseColor = mat.color ?? new THREE.Color(0xffffff);
+    picker.value = '#' + baseColor.getHexString();
+    picker.addEventListener('input', () => {
+      if (mat.color) mat.color.set(picker.value);
+      mat.needsUpdate = true;
+    });
+
+    row.appendChild(name);
+    row.appendChild(picker);
+    host.appendChild(row);
+  });
+}
 
 // Stub control hooks so the inline onclick/oninput handlers don't throw.
 window.setViseme = (v) => console.log('viseme:', v);
